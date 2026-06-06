@@ -23,7 +23,7 @@
 #
 
 
-import imp
+import importlib.util
 import os
 import logging
 
@@ -89,22 +89,18 @@ def import_extension(app, name, filename):
     filename2 = os.path.join(filename, u"__init__.py")
 
     try:
-        infile = open(filename2)
-    except Exception as e:
-        raise keepnote.KeepNotePreferenceError("cannot load extension '%s'" %
-                                               filename, e)
-
-    try:
-        mod = imp.load_module(name, infile, filename2,
-                              (".py", "rb", imp.PY_SOURCE))
+        spec = importlib.util.spec_from_file_location(name, filename2)
+        if spec is None or spec.loader is None:
+            raise Exception("Cannot create module spec")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        
         ext = mod.Extension(app)
         ext.key = name
         ext.read_info()
-        infile.close()
         return ext
 
     except Exception as e:
-        infile.close()
         raise keepnote.KeepNotePreferenceError("cannot load extension '%s'" %
                                                filename, e)
 

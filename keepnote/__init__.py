@@ -250,7 +250,7 @@ def print_runtime_info(out=None):
 
     from keepnote.notebook.connection.fs.index import sqlite
     out.write("sqlite: " + sqlite.__file__+"\n"
-              "sqlite.version: " + sqlite.version+"\n"
+              "sqlite.version: " + getattr(sqlite, 'version', 'N/A')+"\n"
               "sqlite.sqlite_version: " + sqlite.sqlite_version+"\n"
               "sqlite.fts3: " + str(test_fts3())+"\n")
 
